@@ -1,0 +1,206 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 0.0), point2=(
+    20.0, 0.0))
+mdb.models['Model-1'].sketches['__profile__'].HorizontalConstraint(
+    addUndoState=False, entity=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[2])
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Part-1', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Part-1'].BaseWire(sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=200.0)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.0, 0.0), point2=(
+    10.0, 0.0))
+mdb.models['Model-1'].sketches['__profile__'].HorizontalConstraint(
+    addUndoState=False, entity=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[2])
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Part-2', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Part-2'].BaseWire(sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].Material(name='Steel')
+mdb.models['Model-1'].materials['Steel'].Density(table=((7830.0, ), ))
+mdb.models['Model-1'].materials['Steel'].Elastic(table=((210000000000.0, 0.3), 
+    ))
+mdb.models['Model-1'].RectangularProfile(a=0.5, b=0.2, name='Profile-1')
+mdb.models['Model-1'].BeamSection(consistentMassMatrix=False, integration=
+    DURING_ANALYSIS, material='Steel', name='Section-1', poissonRatio=0.0, 
+    profile='Profile-1', temperatureVar=LINEAR)
+mdb.models['Model-1'].parts['Part-2'].SectionAssignment(offset=0.0, 
+    offsetField='', offsetType=MIDDLE_SURFACE, region=Region(
+    edges=mdb.models['Model-1'].parts['Part-2'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )), sectionName='Section-1', thicknessAssignment=
+    FROM_SECTION)
+mdb.models['Model-1'].parts['Part-1'].SectionAssignment(offset=0.0, 
+    offsetField='', offsetType=MIDDLE_SURFACE, region=Region(
+    edges=mdb.models['Model-1'].parts['Part-1'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )), sectionName='Section-1', thicknessAssignment=
+    FROM_SECTION)
+mdb.models['Model-1'].parts['Part-1'].assignBeamSectionOrientation(method=
+    N1_COSINES, n1=(0.0, 0.0, -1.0), region=Region(
+    edges=mdb.models['Model-1'].parts['Part-1'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )))
+mdb.models['Model-1'].parts['Part-2'].assignBeamSectionOrientation(method=
+    N1_COSINES, n1=(0.0, 0.0, -1.0), region=Region(
+    edges=mdb.models['Model-1'].parts['Part-2'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )))
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-1-1', 
+    part=mdb.models['Model-1'].parts['Part-1'])
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-2-1', 
+    part=mdb.models['Model-1'].parts['Part-2'])
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-2-1', ), 
+    vector=(20.0, 0.0, 0.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-2-1', ), 
+    vector=(5.0, 0.0, 0.0))
+mdb.models['Model-1'].StaticStep(name='Step-1', previous='Initial')
+mdb.models['Model-1'].Tie(adjust=ON, main=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )), name='Constraint-1', positionTolerance=5.0, 
+    positionToleranceMethod=SPECIFIED, secondary=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-2-1'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )), thickness=ON, tieRotations=ON)
+mdb.models['Model-1'].Pressure(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, field='', magnitude=-1.0, name='Load-1', region=
+    Region(
+    end1Edges=mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-1'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
+    'BC-1', region=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-1'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )), u1=0.0, u2=0.0, u3=0.0, ur1=UNSET, ur2=UNSET, ur3=
+    UNSET)
+del mdb.models['Model-1'].boundaryConditions['BC-1']
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
+    'BC-1', region=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-1'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )), u1=0.0, u2=0.0, u3=0.0, ur1=0.0, ur2=0.0, ur3=0.0)
+mdb.models['Model-1'].parts['Part-2'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=1.0)
+mdb.models['Model-1'].parts['Part-2'].generateMesh()
+mdb.models['Model-1'].parts['Part-1'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=2.0)
+mdb.models['Model-1'].parts['Part-1'].generateMesh()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Job-1', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numGPUs=0, numThreadsPerMpiProcess=1, queue=None, resultsFormat=
+    ODB, scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, 
+    waitMinutes=0)
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(ERROR, {
+    'message': 'Analysis Input File Processor exited with an error - Please see the  Job-1.dat file for possible error messages if the file exists.', 
+    'jobName': 'Job-1'})
+mdb.jobs['Job-1']._Message(JOB_ABORTED, {
+    'message': 'Analysis Input File Processor exited with an error - Please see the  Job-1.dat file for possible error messages if the file exists.', 
+    'jobName': 'Job-1'})
+del mdb.models['Model-1'].loads['Load-1']
+mdb.models['Model-1'].LineLoad(comp2=-1.0, createStepName='Step-1', name=
+    'Load-1', region=Region(
+    edges=mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-1'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )))
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Wed Feb 28 15:14:04 2024', 
+    'jobName': 'Job-1'})
+mdb.models['Model-1'].constraints['Constraint-1'].setValues(
+    positionToleranceMethod=COMPUTED)
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Wed Feb 28 15:16:14 2024', 
+    'jobName': 'Job-1'})
+mdb.models['Model-1'].constraints['Constraint-1'].setValues(adjust=OFF, 
+    positionTolerance=5.0, positionToleranceMethod=SPECIFIED)
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Wed Feb 28 15:18:41 2024', 
+    'jobName': 'Job-1'})
+# Save by marku on 2024_02_28-15.24.23; build 2022 2021_09_15-19.57.30 176069
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-1-2', 
+    part=mdb.models['Model-1'].parts['Part-1'])
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-2-2', 
+    part=mdb.models['Model-1'].parts['Part-2'])
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1-2', ), 
+    vector=(0.0, 0.0, 1.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-2-2', ), 
+    vector=(20.0, 0.0, 1.0))
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-2-2', ), 
+    vector=(5.0, 0.0, 0.0))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Initial', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='BC-2', 
+    region=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-1-2'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-2'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )), u1=SET, u2=SET, u3=SET, ur1=SET, ur2=SET, ur3=SET)
+mdb.models['Model-1'].boundaryConditions.delete(('BC-1', 'BC-2'))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Initial', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='BC-1', 
+    region=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-2'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-1'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-2'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )), u1=SET, u2=SET, u3=SET, ur1=SET, ur2=SET, ur3=SET)
+mdb.models['Model-1'].LineLoad(comp2=-1.0, createStepName='Step-1', name=
+    'Load-2', region=Region(
+    edges=mdb.models['Model-1'].rootAssembly.instances['Part-1-2'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-2'].edges.getSequenceFromMask(
+    mask=('[#1 ]', ), )))
+del mdb.models['Model-1'].constraints['Constraint-1']
+mdb.models['Model-1'].Tie(adjust=OFF, main=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-1-1'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-1-2'].vertices.getSequenceFromMask(
+    mask=('[#2 ]', ), )), name='Constraint-1', positionTolerance=5.0, 
+    positionToleranceMethod=SPECIFIED, secondary=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-2-1'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )+\
+    mdb.models['Model-1'].rootAssembly.instances['Part-2-2'].vertices.getSequenceFromMask(
+    mask=('[#1 ]', ), )), thickness=ON, tieRotations=ON)
+mdb.jobs['Job-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1']._Message(JOB_COMPLETED, {'time': 'Wed Feb 28 16:14:45 2024', 
+    'jobName': 'Job-1'})
+# Save by marku on 2024_02_28-16.14.59; build 2022 2021_09_15-19.57.30 176069

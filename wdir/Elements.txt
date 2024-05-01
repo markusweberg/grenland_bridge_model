@@ -1,0 +1,22 @@
+Bridge deck:
+1-608
+
+Main tower west:
+609-772
+
+Main tower east:
+773-936
+
+Main tower lower coupling:
+937-952
+
+Main tower mid coupling:
+953-966
+
+Main tower upper coupling:
+967-979
+
+Column 3:
+980-1029
+
+Column 4:
